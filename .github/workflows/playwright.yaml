@@ -1,70 +1,72 @@
 name: Playwright Tests
+
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    
-    - name: Install dependencies
-      run: npm ci --force
-    
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps --force
-    
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: allure-results
-        path: allure-results
 
-  generate-report-and-deploy-to-gh-pages:
-    if: always()
-    timeout-minutes: 15
     steps:
-    - name: Download Artifacts
-      uses: actions/download-artifact@v3
-      id: download-artifacts
-      if: always()
-      with:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install dependencies
+        run: npm ci --force
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps --force
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - name: Upload Allure results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
           name: allure-results
           path: allure-results
 
-    - name: Get Allure history
-      uses: actions/checkout@v2
-      if: always()
-      continue-on-error: true
-      with:
+  generate-report-and-deploy-to-gh-pages:
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: allure-results
+          path: allure-results
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
           ref: gh-pages
           path: gh-pages
 
-    - name: Generate Allure report 
-    - uses: simple-elf/allure-report-action@v1.8 
-      if: always()
-      id: allure-report
-      with: 
-        allure_results_path: allure-results
-        gh_pages: gh-pages
-        allure_report: allure-report
-        allure_history: allure-history
-        keep_reports: 10
-        # report_url: https://pages.git.i.mercedes-benz.com/dh-io-vmos/vmos-qa-ui/${{ env.ENV }}/${{ env.COMPONENT }}
-        
-    - name: Deploy report to Github Pages
-      uses: peaceiris/actions-pages@v4
-      with:
-          PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISH_BRANCH: gh-pages
-          PUBLISH_DIR: allure-history
+      - name: Generate Allure report
+        uses: simple-elf/allure-report-action@v1.8
+        if: always()
+        id: allure-report
+        with:
+          allure_results_path: allure-results
+          gh_pages: gh-pages
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 10
+
+      - name: Deploy report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
