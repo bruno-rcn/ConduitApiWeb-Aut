@@ -10,7 +10,8 @@ export default defineConfig({
   use: {
     trace: 'on-first-retry',
     baseURL: 'https://conduit.bondaracademy.com/',
-    screenshot: 'on'
+    screenshot: 'on',
+    video: 'on'
   },
 
   projects: [
