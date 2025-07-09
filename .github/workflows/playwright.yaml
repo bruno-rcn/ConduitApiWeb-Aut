@@ -30,7 +30,7 @@ jobs:
         name: allure-results
         path: allure-results
 
-generate-report-and-deploy-to-gh-pages:
+  generate-report-and-deploy-to-gh-pages:
     if: always()
     timeout-minutes: 15
     steps:
