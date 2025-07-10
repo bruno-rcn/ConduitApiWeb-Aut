@@ -1,0 +1,4 @@
+- npm cache clean --force
+- npx playwright test
+- allure generate ./allure-results -o allure-report --clean
+- allure generate --single-file allure-results --clean

@@ -1,10 +1,10 @@
-name: Playwright Tests
+name: Playwright Tests MVP
 
 on:
   push:
-    branches: [main, master]
+    branches: [ main, master ]
   pull_request:
-    branches: [main, master]
+    branches: [ main, master ]
 
 jobs:
   test:
@@ -12,60 +12,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
 
-      - name: Install dependencies
-        run: npm ci --force
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps --force
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
 
-      - name: Run Playwright tests
-        run: npx playwright test
+    - name: Run Playwright tests
+      run: npx playwright test --reporter=line,allure-playwright
 
-      - name: Upload Allure results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: allure-results
-          path: allure-results
+    - name: Get Allure history
+      uses: actions/checkout@v4
+      if: always()
+      continue-on-error: true
+      with:
+        ref: gh-pages
+        path: gh-pages
 
-  generate-report-and-deploy-to-gh-pages:
-    needs: test
-    if: always()
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    - name: Generate Allure Report
+      uses: allure-framework/allure-action@v1
+      if: always()
+      with:
+        allure_results: allure-results
+        allure_history: allure-history
+        keep_reports: 20
 
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: allure-results
-          path: allure-results
+    - name: Upload Playwright report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
 
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages
-
-      - name: Generate Allure report
-        uses: simple-elf/allure-report-action@v1.8
-        if: always()
-        id: allure-report
-        with:
-          allure_results_path: allure-results
-          gh_pages: gh-pages
-          allure_report: allure-report
-          allure_history: allure-history
-          keep_reports: 10
-
-      - name: Deploy report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          publish_branch: gh-pages
-          publish_dir: allure-history
+    - name: Deploy to GitHub Pages
+      if: always()
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: allure-report
