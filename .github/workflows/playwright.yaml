@@ -5,6 +5,16 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      Component:
+            type: choice
+            required: true
+            default: 'All'
+            options:
+              - 'All'
+              - 'FrontEnd'
+              - 'BackEnd'
 
 jobs:
   test:
