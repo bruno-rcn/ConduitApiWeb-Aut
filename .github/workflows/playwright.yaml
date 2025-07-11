@@ -37,7 +37,8 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test --reporter=line,allure-playwright
-        uses: actions/upload-artifact@v4
+        
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: allure-results
