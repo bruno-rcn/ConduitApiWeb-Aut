@@ -1,6 +1,6 @@
 # Conduit Test Automation - (API & Web)
 
-![CI/CD Workflow](https://github.com/bruno-rcn/ConduitApiWeb-Aut/actions/workflows/ci.yml/badge.svg)
+[CI/CD Workflow](https://github.com/bruno-rcn/ConduitApiWeb-Aut/actions/workflows/ci.yml/badge.svg)
 [![Test Report](https://img.shields.io/badge/Test_Report-View_Online-28a745?style=for-the-badge)](https://bruno-rcn.github.io/ConduitApiWeb-Aut/)
 
 An end-to-end test automation framework for the [Conduit (RealWorld App)](https://demo.realworld.io/) application, covering both front-end (Web UI) and back-end (API) tests.
