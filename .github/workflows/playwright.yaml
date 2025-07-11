@@ -87,5 +87,5 @@ jobs:
             authToken: ${{secrets.GITHUB_TOKEN}}
             context: 'Test report'
             state: 'success'
-            sha: ${{ github.event.pull_request.head.sha }}
+            sha: ${{ github.sha }}
             target_url: https://bruno-rcn.github.io/ConduitApiWeb-Aut/github-allure-history/${{ github.run_number }}
